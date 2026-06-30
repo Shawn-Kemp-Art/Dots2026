@@ -262,6 +262,13 @@ var renderTime;
 
     paper.view.autoUpdate = false;
 
+    // Clipper "cold-start" warm-up: the very first Clipper boolean op silently
+    // returns empty if it runs before paper.js has yielded/rendered once. Force a
+    // render + macrotask yield here so the first real op (drawFrame's clipSubtract
+    // on layer 0) isn't the cold one, otherwise the bottom layer comes out empty.
+    paper.view.update();
+    await new Promise(resolve => setTimeout(resolve, 0));
+
     //var lineswidth= 5+fxrand()*10
     for (z = 0; z < stacks; z++) {
     pz=z*prange;
